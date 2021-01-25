@@ -1,0 +1,24 @@
+{
+  "name": "boltzshopper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "boltzshopper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "bin": "./boltzshopper.js",
+  "author": "Chris Dickinson <chris@neversaw.us> (http://neversaw.us/)",
+  "license": "MIT",
+  "dependencies": {
+    "bl": "^0.8.0",
+    "colors-tmpl": "^1.0.0",
+    "hapi": "6.x.x",
+    "hyperquest": "0.1.x",
+    "through2": "^0.4.1",
+    "workshopper": "^2.7.0",
+    "workshopper-boilerplate": "^1.1.2",
+    "workshopper-exercise": "^3.0.3",
+    "workshopper-wrappedexec": "^0.1.1"
+  }
+}
