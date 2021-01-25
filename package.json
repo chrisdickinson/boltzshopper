@@ -13,6 +13,7 @@
   "dependencies": {
     "bl": "^0.8.0",
     "colors-tmpl": "^1.0.0",
+    "cpr": "^3.0.1",
     "hapi": "6.x.x",
     "hyperquest": "0.1.x",
     "through2": "^0.4.1",

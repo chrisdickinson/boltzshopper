@@ -3,6 +3,9 @@
 Eventually you'll want to upgrade to a newer version of the Boltzmann
 scaffolding, or to turn a particular Boltzmann feature on or off.
 
+This lesson created a scaffold project in "upgrading/" in your current working
+directory. You should `cd upgrading/` now.
+
 Let's turn the status endpoint _off_, while turning JWT functionality
 _on_. To do so, you can run **either** of the following commands:
 
