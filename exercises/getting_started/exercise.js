@@ -11,16 +11,16 @@ exercise.longCompareOutput = true
 
 // checks that the submission file actually exists
 
-exercise.addProcessor((mode, callback) => {
+exercise.addProcessor((mode, ready) => {
   let submission = exercise.args[0] || process.cwd()
 
   fs.stat(submission, (err, stat) => {
     if ((err && err.code == 'ENOENT') || !stat) {
-      return callback(new Error('No such file or directory: ' + submission))
+      return ready(new Error('No such file or directory: ' + submission))
     }
 
     if (err) {
-      return callback(err)
+      return ready(err)
     }
 
     if (stat.isFile()) {
@@ -33,20 +33,27 @@ exercise.addProcessor((mode, callback) => {
 
   function checkpackage (err, stat) {
     if ((err && err.code == 'ENOENT') || !stat) {
-      return callback(new Error(`Could not find package.json; tried "${submission}". Are you running boltzshopper from your solution directory?`))
+      return ready(new Error(`Could not find package.json; tried "${submission}". Are you running boltzshopper from your solution directory?`))
     }
 
     if (!stat.isFile()) {
-      return callback(new Error(`Found package.json, but it wasn't a file! That's pretty strange!`))
+      return ready(new Error(`Found package.json, but it wasn't a file! That's pretty strange!`))
     }
 
     const contents = JSON.parse(fs.readFileSync(submission, 'utf8'))
 
     if (!contents.boltzmann) {
-      return callback(new Error('Whoops, you might have run `npx boltzmann` or `npm init`. Try `npx boltzmann-cli .`!'))
+      exercise.emit('fail', 'Whoops, you might have run `npx boltzmann` or `npm init`. Try `npx boltzmann-cli .`!')
+      return ready(null, false)
     }
 
-    return callback(null, 'Great work! This looks like a boltzmann project. Make another directory and run boltzshopper to start the next lesson!')
+    if (mode !== 'run') {
+      exercise.emit('pass', 'Great work! You\'ve successfully upgraded a Boltzmann app. You\'re ready for the next lesson!')
+    } else {
+      exercise.emit('pass', 'LGTM! Run "boltzshopper verify ." to continue!')
+    }
+
+    return ready(null, true)
   }
 })
 

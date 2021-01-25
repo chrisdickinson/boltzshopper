@@ -47,25 +47,32 @@ exercise.addProcessor((mode, ready) => {
     const contents = JSON.parse(fs.readFileSync(submission, 'utf8'))
 
     if (!contents.boltzmann) {
-      return ready(new Error('Whoops, you might have run `npx boltzmann` or `npm init`. Try `npx boltzmann-cli .`!'))
+      exercise.emit('fail', 'Whoops, you might have run `npx boltzmann` or `npm init`. Try `npx boltzmann-cli .`!')
+      return ready(null, false)
     }
 
     if (contents.boltzmann.version === '0.3.0') {
-      return ready(new Error('It looks like you haven\'t run the upgrade command: this Boltzmann app is on 0.3.0 when newer versions are available.'))
+      exercise.emit('fail', 'It looks like you haven\'t run the upgrade command: this Boltzmann app is on 0.3.0 when newer versions are available. Run "boltzshopper print" to see how to upgrade!')
+      return ready(null, false)
     }
 
     if (!contents.boltzmann.jwt) {
-      return ready(new Error('Whoops, you didn\'t turn on the JWT feature. Rerun the upgrade command with "--jwt"!'))
+      exercise.emit('fail', 'Whoops, you didn\'t turn on the JWT feature. Rerun the upgrade command with "--jwt"!')
+      return ready(null, false)
     }
 
     if (contents.boltzmann.status) {
-      return ready(new Error('Whoops, you didn\'t turn off the status feature. Rerun the upgrade command with "--status=off"!'))
+      exercise.emit('fail', 'Whoops, you didn\'t turn off the status feature. Rerun the upgrade command with "--status=off"!')
+      return ready(null, false)
     }
 
     if (mode !== 'run') {
-      console.log('Great work! You\'ve successfully upgraded a Boltzmann app. You\'re ready for the next lesson!')
+      exercise.emit('pass', 'Great work! You\'ve successfully upgraded a Boltzmann app. You\'re ready for the next lesson!')
+    } else {
+      exercise.emit('pass', 'LGTM! Run "boltzshopper verify ." to continue!')
     }
-    return ready()
+
+    return ready(null, true)
   }
 })
 
