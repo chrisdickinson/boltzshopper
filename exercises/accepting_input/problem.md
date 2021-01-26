@@ -12,7 +12,7 @@ Boltzmann route handlers can have middleware attached to them.
 
 ```js
 handlerFunc.route = "GET /"
-hanlderFunc.decorators = [
+handlerFunc.middleware = [
     // route-attached middleware goes here
 ]
 async function handlerFunc(context) { ... }

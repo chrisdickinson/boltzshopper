@@ -47,7 +47,7 @@ books.add({ title: 'The Art of Programming, Vol 1', author: 'Donald Knuth', year
 
 // Fetch a book by ID, validating that we have an id that is exactly 32 characters long.
 bookByID.route = 'GET /books/book/:id'
-bookByID.decorators = [
+bookByID.middleware = [
   middleware.validate.params({
     type: 'object',
     required: ['id'],
@@ -79,7 +79,7 @@ async function listBooks(/** @type {Context} */ context) {
 
 // Add a book to the database.
 addBook.route = 'POST /books'
-addBook.decorators = []
+addBook.middleware = []
 async function addBook(/** @type {Context} */ context) {
   // TODO:
   // add a book to our list
