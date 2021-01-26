@@ -14,7 +14,7 @@ exercise.addPrepare(ready => {
   if (!fs.existsSync(dest)) {
     cpr(path.join(__dirname, 'scaffold'), dest, install)
   } else {
-    install()
+    ready()
   }
 
   function install(err) {
