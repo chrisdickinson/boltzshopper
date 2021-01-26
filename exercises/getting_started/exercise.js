@@ -6,6 +6,8 @@ const fs = require('fs')
 
 const exercise = workshopper()
 
+const finalArg = process.argv[process.argv.length - 1]
+
 // the output will be long lines so make the comparison take that into account
 exercise.longCompareOutput = true
 
@@ -43,14 +45,14 @@ exercise.addProcessor((mode, ready) => {
     const contents = JSON.parse(fs.readFileSync(submission, 'utf8'))
 
     if (!contents.boltzmann) {
-      exercise.emit('fail', 'Whoops, you might have run `npx boltzmann` or `npm init`. Try `npx boltzmann-cli .`!')
+      exercise.emit('fail', 'Whoops, you might have run `npx boltzmann` or `npm init`. Try `npx boltzmann-cli ' + finalArg + '`!')
       return ready(null, false)
     }
 
     if (mode !== 'run') {
-      exercise.emit('pass', 'Great work! You\'ve successfully upgraded a Boltzmann app. You\'re ready for the next lesson!')
+      exercise.emit('pass', 'Great work! You\'ve successfully scaffolded a Boltzmann app. You\'re ready for the next lesson!')
     } else {
-      exercise.emit('pass', 'LGTM! Run "boltzshopper verify ." to continue!')
+      exercise.emit('pass', `LGTM! Run "boltzshopper verify ${process.argv[process.argv.length - 1]}" to continue!`)
     }
 
     return ready(null, true)
