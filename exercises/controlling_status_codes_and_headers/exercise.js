@@ -8,6 +8,8 @@ const fs = require('fs')
 
 const exercise = workshopper()
 
+// XXX literally just copy-pasted from the last lesson; delete at WILL
+
 exercise.addPrepare(ready => {
   const dest = path.join(process.cwd(), 'writing-handlers')
   cpr(path.join(__dirname, 'scaffold'), dest, install)

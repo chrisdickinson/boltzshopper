@@ -10,7 +10,7 @@ text responses, while objects are automatically `JSON.stringify`'d.
 You can read more about these behaviors in the [Boltzmann Routing concept
 documentation](https://www.boltzmann.dev/en/docs/latest/concepts/handlers/).
 
-Starting this lesson created a scaffold for you in `./handlers/`. `cd` there
+Starting this lesson created a scaffold for you in `./writing-handlers/`. `cd` there
 now.
 
 For this lesson, we want to add a handler that responds to `GET /hello/:foo`
