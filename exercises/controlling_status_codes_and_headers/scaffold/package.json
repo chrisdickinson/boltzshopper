@@ -44,7 +44,7 @@
   },
   "boltzmann": {
     "version": "0.4.0",
-    "githubci": true,
+    "githubci": false,
     "ping": true,
     "status": true
   }

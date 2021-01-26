@@ -5,13 +5,14 @@ const child_process = require('child_process')
 const path = require('path')
 const cpr = require('cpr')
 const fs = require('fs')
+const { headers } = require('./scaffold/handlers')
 
 const exercise = workshopper()
 
 // XXX literally just copy-pasted from the last lesson; delete at WILL
 
 exercise.addPrepare(ready => {
-  const dest = path.join(process.cwd(), 'writing-handlers')
+  const dest = path.join(process.cwd(), 'http-metadata')
   cpr(path.join(__dirname, 'scaffold'), dest, install)
 
   function install(err) {
@@ -71,42 +72,46 @@ exercise.addProcessor((mode, ready) => {
       return ready(null, false)
     }
 
-    const input = mode === 'run' ? 'world' : 'hello-operator-give-me-number-nine'
-    var response = null
-    const wrapped = boltzmann.middleware.test({})(async assert => {
-      response = await assert.request({ url: `/hello/${input}` })
+    var thrower = null
+    var headerer = null
+    const wrappedThrow = boltzmann.middleware.test({})(async assert => {
+      thrower = await assert.request({ url: '/throws' })
+    })
+    const wrappedHeaders = boltzmann.middleware.test({})(async assert => {
+      headerer = await assert.request({ url: '/headers' })
     })
 
-    wrapped({}).then(() => {
-      process.nextTick(() => ontest(null, { response, input }))
+    Promise.all([wrappedThrow({}), wrappedHeaders({})]).then(() => {
+      process.nextTick(() => evaluateBoth(null, thrower, headerer))
     }, err => {
-      process.nextTick(() => ontest(err))
+      process.nextTick(() => evaluateBoth(err))
     })
   }
 
-  function ontest (err, result) {
+  function evaluateBoth (err, thrower, hasHeaders) {
     if (err) {
       exercise.emit('fail', 'caught error when attempting to request endpoint!')
       return ready(err)
     }
 
-    if (!result.response || !result.response.payload) {
-      exercise.emit('fail', 'got an empty response from endpoint')
+    if (thrower.statusCode !== 418) {
+      exercise.emit('fail', `The throws() handler responded with status code ${thrower.statusCode}, not the requested 418!`)
       return ready(null, false)
     }
 
-    if (result.response.payload.toUpperCase() !== result.input.toUpperCase()) {
-      exercise.emit('fail', `hm, got the wrong response text ("${result.response.payload}")`)
+    if (hasHeaders.statusCode !== 203) {
+      exercise.emit('fail', `The headers() handler responded with status code ${hasHeaders.statusCode}, not the requested 203!`)
       return ready(null, false)
     }
 
-    if (result.response.payload !== result.input.toUpperCase()) {
-      exercise.emit('fail', 'got the correct response text, but in the wrong case (it should be UPPER CASE)')
+    // let's not get fussy about what's in the header, just that it's set
+    if (!hasHeaders.headers['wow-great-header']) {
+      exercise.emit('fail', `The headers() handler did not set the \`wow-great-header\` header.`)
       return ready(null, false)
     }
 
     if (mode !== 'run') {
-      exercise.emit('pass', 'Great work! You\'ve successfully added a new route to a Boltzmann app. You\'re ready for the next lesson!')
+      exercise.emit('pass', 'Great work! You\'ve successfully used symbols to add metadata to a Boltzmann response. You\'re ready for the next lesson!')
     } else {
       exercise.emit('pass', 'LGTM! Run "boltzshopper verify ." to continue!')
     }

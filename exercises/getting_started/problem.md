@@ -15,8 +15,8 @@ keeping your project up-to-date with the latest scaffold.
 In this lesson, we'll start a new boltzmann application. Try it now! Run:
 
 ```
-$ npx boltzmann-cli .
+$ npx boltzmann-cli hello
 ```
 
-Then check your solution with `boltzshopper run .`. To move to the next lesson
-run `boltzshopper verify .`.
+Then check your solution with `boltzshopper run hello`. To move to the next lesson
+run `boltzshopper verify hello`.
