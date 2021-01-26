@@ -45,17 +45,17 @@ books.add({ title: 'Dirk Gently\'s Holistic Detective Agency', author: 'Douglas 
 books.add({ title: 'Small Gods', author: 'Terry Pratchett', year: 1992, genre: 'SFF' })
 books.add({ title: 'The Art of Programming, Vol 1', author: 'Donald Knuth', year: 1968, genre: 'nonfiction' })
 
-listBooks.route = 'GET /books'
-async function listBooks(/** @type {Context} */ context) {
-  // TODO filter books by the following query params:
-  // genre=string
-  // author=string
-  // year=number
-  return books.all()
-}
-
-addBook.decorators = []
+// Fetch a book by ID, validating that we have an id that is exactly 32 characters long.
 bookByID.route = 'GET /books/book/:id'
+bookByID.decorators = [
+  middleware.validate.params({
+    type: 'object',
+    required: ['id'],
+    properties: {
+      id: { type: 'string', minLength: 32, maxLength: 32 }
+    }
+  })
+]
 async function bookByID(/** @type {Context} */ context) {
   const book = books.get(context.params.id)
   if (book) {
@@ -65,10 +65,24 @@ async function bookByID(/** @type {Context} */ context) {
   return Object.assign('Book not found', { [Symbol.for('status')]: 404 })
 }
 
+// Get an array of all books in the database, optionally filtering the list
+// to specific criteria.
+listBooks.route = 'GET /books'
+async function listBooks(/** @type {Context} */ context) {
+  // TODO
+  // filter books by the following query params:
+  // genre=string
+  // author=string
+  // year=number
+  return books.all()
+}
+
+// Add a book to the database.
 addBook.route = 'POST /books'
 addBook.decorators = []
 async function addBook(/** @type {Context} */ context) {
-  // TODO: add a book to our list
+  // TODO:
+  // add a book to our list
   // validate input to be sure it has at least a title & author
   // respond with the generated id
 }

@@ -11,7 +11,11 @@ const exercise = workshopper()
 
 exercise.addPrepare(ready => {
   const dest = path.join(process.cwd(), 'accepting-input')
-  cpr(path.join(__dirname, 'scaffold'), dest, install)
+  if (!fs.existsSync(dest)) {
+    cpr(path.join(__dirname, 'scaffold'), dest, install)
+  } else {
+    install()
+  }
 
   function install(err) {
     if (err) {
