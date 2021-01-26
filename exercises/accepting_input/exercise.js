@@ -9,10 +9,8 @@ const { headers } = require('./scaffold/handlers')
 
 const exercise = workshopper()
 
-// XXX literally just copy-pasted from the last lesson; delete at WILL
-
 exercise.addPrepare(ready => {
-  const dest = path.join(process.cwd(), 'http-metadata')
+  const dest = path.join(process.cwd(), 'accepting-input')
   cpr(path.join(__dirname, 'scaffold'), dest, install)
 
   function install(err) {
@@ -72,63 +70,86 @@ exercise.addProcessor((mode, ready) => {
       return ready(null, false)
     }
 
-    var pratchett = null
-    var mikeFord = null
-    var badOmens = null
-
+    const results = {}
     const getPratchettWrapped = boltzmann.middleware.test({})(async assert => {
-      pratchett = await assert.request({ url: '/books/book/e1edac325ddd67fb8c3e1b1ac244f3a8' })
+      results.pratchett = await assert.request({ url: '/books/book/e1edac325ddd67fb8c3e1b1ac244f3a8' })
+    })
+    const filteredWrapped = boltzmann.middleware.test({})(async assert => {
+      results.filtered = await assert.request({ url: '/books?genre=satire' })
     })
     const addBookWrapped = boltzmann.middleware.test({})(async assert => {
-      mikeFord = await assert.request({
-        url: '/headers',
+      results.mikeFord = await assert.request({
+        url: '/books',
         method: 'POST',
         payload: { title: 'The Final Reflection', author: 'John M. Ford', year: 1984 }
      })
     })
     const addBadWrapped = boltzmann.middleware.test({})(async assert => {
-      badOmens = await assert.request({
-        url: '/headers',
+      results.badOmens = await assert.request({
+        url: '/books',
         method: 'POST',
         payload: { title: 'Good Omens', year: 1990 }
      })
     })
 
-    Promise.all([getPratchettWrapped({}), addBookWrapped({}), addBadWrapped({})]).then(() => {
-      process.nextTick(() => evaluateResults(null, pratchett, mikeFord, badOmens))
+    Promise.all([
+      getPratchettWrapped({}),
+      addBookWrapped({}),
+      addBadWrapped({}),
+      filteredWrapped({})
+    ]).then(() => {
+      process.nextTick(() => evaluateResults(null, results))
     }, err => {
       process.nextTick(() => evaluateResults(err))
     })
   }
 
-  function evaluateBoth (err, pratchett, mikeFord, badOmens) {
+  function evaluateResults (err, results) {
     if (err) {
       exercise.emit('fail', 'caught error when attempting to request endpoint!')
       return ready(err)
     }
 
-    if (pratchett.statusCode !== 200) {
-      exercise.emit('fail', `The bookByID() handler responded with status code ${pratchett.statusCode}, not the requested book!`)
+    if (results.pratchett.statusCode !== 200) {
+      exercise.emit('fail', `The bookByID() handler responded with status code ${results.pratchett.statusCode}, not the requested book!`)
       return ready(null, false)
     }
 
-    if (JSON.parse(pratchett).title !== 'Small Gods') {
+    if (JSON.parse(results.pratchett.payload).title !== 'Small Gods') {
       exercise.emit('fail', `The bookByID() handler responded with the wrong book!`)
       return ready(null, false)
     }
 
-    if (mikeFord.statusCode !== 200) {
-      exercise.emit('fail', `The addBook() handler responded with status code ${mikeFord.statusCode} to a perfectly reasonable new book.`)
+    const expectOne = JSON.parse(results.filtered.payload)
+    if (!Array.isArray(expectOne) || expectOne.length !== 1) {
+      exercise.emit('fail', `Expected an array response to our filtered query. Got ${expectOne} instead`)
       return ready(null, false)
     }
 
-    if (mikeFord.payload !== '343e9802b5785bc15359c9ac2c0e4d88') {
-      exercise.emit('fail', `The addBook() handler responded with an unexpected ID for the book: ${mikeFord.payload}`)
+    if (expectOne.length < 1 || expectOne[0].title !== 'Pride and Prejudice') {
+      exercise.emit('fail', `Expected to get P&P back from our filtered query! Got ${expectOne} instead`)
       return ready(null, false)
     }
 
-    // validate that bad input is rejected
+    if (!results.mikeFord.payload) {
+      exercise.emit('fail', `The addBook() handler did not respond with an id for the new book!`)
+      return ready(null, false)
+    }
 
+    if (results.mikeFord.payload !== '343e9802b5785bc15359c9ac2c0e4d88') {
+      exercise.emit('fail', `The addBook() handler responded with an unexpected ID for the book: ${results.mikeFord.payload}`)
+      return ready(null, false)
+    }
+
+    if (results.mikeFord.statusCode !== 200) {
+      exercise.emit('fail', `The addBook() handler responded with status code ${results.mikeFord.statusCode} to a perfectly reasonable new book.`)
+      return ready(null, false)
+    }
+
+    if (results.badOmens.statusCode !== 400) {
+      exercise.emit('fail', `The addBook() handler responded with status code ${results.badOmens.statusCode} to bad input; expected 400.`)
+      return ready(null, false)
+    }
 
     if (mode !== 'run') {
       exercise.emit('pass', 'Great work! You\'ve successfully accepted and validated input. You\'re ready for the next lesson!')
