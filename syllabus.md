@@ -12,7 +12,7 @@
 - [x] writing a handler
   - add an endpoint that accepts "/hi/:there" and responds "hi {there}"
   - check that 2-3 random words work
-- [ ] controlling status codes and headers
+- [x] controlling status codes and headers
   - you have two endpoints: one that throws an error, and one that
     returns a stream
   - make the error a 418, and make the stream return a 203 with a
