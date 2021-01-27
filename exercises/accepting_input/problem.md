@@ -18,14 +18,16 @@ handlerFunc.middleware = [
 async function handlerFunc(context) { ... }
 ```
 
-A later exercise will show you how to write middleware, but right now we're going to use Boltzmann's
-built-in _input validator_ middleware. Boltzmann provides input validators built on top of [ajv:
+You can use Boltzmann's built-in _input validator_ middleware to enforce validate input and respond
+with status 400 when our requirements aren't met. Boltzmann's validators are built on top of [ajv:
 another JSON Schema Validator](https://ajv.js.org). These validators are exported from Boltzmann as
-`middleware.validate`, and each accepts an AJV schema object:
+`middleware.validate`:
 
 * `middleware.validate.body()`: validate the incoming body
 * `middleware.validate.query()`: validate the incoming query string
 * `middleware.validate.params()`: validate the incoming route params
+
+Each validator accepts an AJV schema definition object.
 
 Let's put together these concepts to build something that looks more like what we need to build in
 real contexts. This lesson created a scaffold for you in `./accepting-input/`. `cd` there now.
