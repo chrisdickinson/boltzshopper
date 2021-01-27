@@ -2,5 +2,6 @@
   "getting started",
   "upgrading",
   "writing a handler",
-  "controlling status codes and headers"
+  "controlling status codes and headers",
+  "accepting input"
 ]
