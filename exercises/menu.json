@@ -3,5 +3,6 @@
   "upgrading",
   "writing a handler",
   "controlling status codes and headers",
+  "writing middleware",
   "accepting input"
 ]
