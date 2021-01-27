@@ -48,13 +48,13 @@ books.add({ title: 'The Art of Programming, Vol 1', author: 'Donald Knuth', year
 // Fetch a book by ID, validating that we have an id that is exactly 32 characters long.
 bookByID.route = 'GET /books/book/:id'
 bookByID.middleware = [
-  middleware.validate.params({
+  [middleware.validate.params, {
     type: 'object',
     required: ['id'],
     properties: {
       id: { type: 'string', minLength: 32, maxLength: 32 }
     }
-  })
+  }]
 ]
 async function bookByID(/** @type {Context} */ context) {
   const book = books.get(context.params.id)

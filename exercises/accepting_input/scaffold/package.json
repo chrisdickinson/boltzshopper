@@ -40,7 +40,7 @@
     "lint": "eslint .",
     "posttest": "npm run lint",
     "start": "nodemon ./boltzmann.js",
-    "test": "tap tests"
+    "test": "boltzshopper run ."
   },
   "boltzmann": {
     "version": "0.4.0",
