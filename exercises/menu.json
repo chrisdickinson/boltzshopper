@@ -4,5 +4,7 @@
   "writing a handler",
   "controlling status codes and headers",
   "writing middleware",
-  "accepting input"
+  "attaching middleware",
+  "accepting input",
+  "persisting data with ORMnomnom"
 ]
