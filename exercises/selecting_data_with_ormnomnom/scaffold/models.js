@@ -22,9 +22,9 @@ class Book {
 
   static objects = orm(Book, {
     id: S.integer(),
-    title: S.string().minLength(1).maxLength(200).required(),
-    slug: S.string().minLength(1).pattern('^[a-zA-Z0-9\\-]+$').required(),
-    author: S.string().minLength(1).required(),
+    title: S.string().minLength(1).maxLength(200),
+    slug: S.string().minLength(1).pattern('^[a-zA-Z0-9\\-]+$'),
+    author: S.string().minLength(1),
     year: S.integer(),
     genre: S.string()
   })

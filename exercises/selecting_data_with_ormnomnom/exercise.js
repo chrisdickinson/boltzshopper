@@ -4,6 +4,7 @@ const isDockerRunning = require('is-docker-running')
 const workshopper = require('workshopper-exercise')
 const child_process = require('child_process')
 const { Client } = require('pg')
+const util = require('util')
 const path = require('path')
 const cpr = require('cpr')
 const fs = require('fs')
@@ -202,7 +203,7 @@ exercise.addProcessor((mode, ready) => {
 
     var response = null
     var postgresClient = null
-    const wrapped = boltzmann.middleware.test({
+    var wrapped = boltzmann.middleware.test({
       after: () => {}
     })(async assert => {
       postgresClient = assert.postgresClient
@@ -219,8 +220,172 @@ exercise.addProcessor((mode, ready) => {
       exercise.emit('fail', `Could not request GET / – caught ${err.stack}`)
       return ready(null, false)
     }
-    console.log(response)
 
+    const results = await client.query('select count(*) as bookcount from books')
+    if (!results.rows || results.rows.length !== 1 || results.rows[0].bookcount !== '4') {
+      exercise.emit('fail', `Whoa! Are you a hacker? It looks like there are more books here than we expected!`)
+      return ready(null, false)
+    }
+
+    if (!response || !response.payload) {
+      exercise.emit('fail', `Did not receive a response from GET /`)
+      return ready(null, false)
+    }
+
+    if (response.statusCode !== 200) {
+      exercise.emit('fail', `Expected a 200 OK from GET /, got ${response.statusCode} instead`)
+      return ready(null, false)
+    }
+
+    var json = null
+    try {
+      json = response.json
+    } catch (err) {
+      exercise.emit('fail', `Expected a JSON response from GET /, but got the following:\n\n${response.payload}`)
+      return ready(null, false)
+    }
+
+    if (!Array.isArray(json)) {
+      exercise.emit('fail', `Expected an array from GET /, got ${util.format(json)} instead`)
+      return ready(null, false)
+    }
+
+    if (json.length !== 3) {
+      exercise.emit('fail', `Expected 3 elements from GET /, got ${json.length} instead`)
+      return ready(null, false)
+    }
+
+    const titles = json.map(({title}) => title).sort()
+    if (titles[0] !== 'Dirk Gently\'s Holistic Detective Agency' ||
+        titles[1] !== 'Pride and Prejudice' ||
+        titles[2] !== 'Small Gods') {
+      exercise.emit('fail', `Expected the books returned to include "Pride and Prejudice", "Dirk Gently[...]", "Small Gods", got the following: ${util.format(json)}`)
+      return ready(null, false)
+    }
+
+    // moving right along..
+    var wrapped = boltzmann.middleware.test({
+      after: () => {}
+    })(async assert => {
+      postgresClient = assert.postgresClient
+      response = await assert.request({ url: `/pride-and-prejudice` })
+    })
+
+    if (postgresClient) {
+      postgresClient.end()
+    }
+
+    try {
+      await wrapped({})
+    } catch (err) {
+      exercise.emit('fail', `Could not request GET /:slug – caught ${err.stack}`)
+      return ready(null, false)
+    }
+
+    if (!response || !response.payload) {
+      exercise.emit('fail', `Did not receive a response from GET /:slug`)
+      return ready(null, false)
+    }
+
+    if (response.statusCode !== 200) {
+      exercise.emit('fail', `Expected a 200 OK from GET /:slug, got ${response.statusCode} instead: ${response.payload}`)
+      return ready(null, false)
+    }
+
+    var json = null
+    try {
+      json = response.json
+    } catch (err) {
+      exercise.emit('fail', `Expected a JSON response from GET /:slug, but got the following:\n\n${response.payload}`)
+      return ready(null, false)
+    }
+
+    if (json.title !== 'Pride and Prejudice' || json.slug !== 'pride-and-prejudice' || json.author !== 'Jane Austen') {
+      exercise.emit('fail', `Expected to get a specific book back from GET /:slug, but got something not quite right! Are you returning a Book instance?`)
+      return ready(null, false)
+    }
+
+    var response = null
+    var postgresClient = null
+    var wrapped = boltzmann.middleware.test({
+      after: () => {}
+    })(async assert => {
+      postgresClient = assert.postgresClient
+      response = await assert.request({ url: `/dne-dne-dne` })
+    })
+
+    if (postgresClient) {
+      postgresClient.end()
+    }
+
+    try {
+      await wrapped({})
+    } catch (err) {
+      exercise.emit('fail', `Could not request GET /:slug – caught ${err.stack}`)
+      return ready(null, false)
+    }
+
+    if (!response || !response.payload) {
+      exercise.emit('fail', `Did not receive a response from GET /:slug`)
+      return ready(null, false)
+    }
+
+    if (response.statusCode !== 404) {
+      exercise.emit('fail', `Expected a 404 Not Found from GET /:slug for a book that doesn't exist, got ${response.statusCode} instead`)
+      return ready(null, false)
+    }
+
+    // BONUS!!
+    const message = (
+      mode !== 'run'
+      ? `You're a middlewizard! In the next lesson, let's use some built-in middleware!`
+      : 'LGTM! Run "boltzshopper verify ." to continue!'
+    )
+
+    var response = null
+    var postgresClient = null
+    var wrapped = boltzmann.middleware.test({
+      after: () => {}
+    })(async assert => {
+      postgresClient = assert.postgresClient
+      response = await assert.request({ url: `/?name=Pratchett` })
+    })
+
+    if (postgresClient) {
+      postgresClient.end()
+    }
+
+    try {
+      await wrapped({})
+    } catch (err) {
+      exercise.emit('pass', message)
+      return ready(null, true)
+    }
+
+    if (response.statusCode !== 200) {
+      exercise.emit('pass', message)
+      return ready(null, true)
+    }
+
+    try {
+      json = response.json
+    } catch (_) { 
+      exercise.emit('pass', message)
+      return ready(null, true)
+    }
+
+    if (!Array.isArray(json)) {
+      exercise.emit('pass', message)
+      return ready(null, true)
+    }
+
+    if (json.length === 1 && json[0].title === 'Small Gods') {
+      // OH MY GOD THEY DID IT
+      exercise.emit('pass', message + ' ALSO YOU GOT THE BONUS ENDPOINT FILTERING WHOAAAAAAAAA. GREAT JOB')
+      return ready(null, true)
+    }
+
+    exercise.emit('pass', message)
     return ready(null, false)
   }
 })
