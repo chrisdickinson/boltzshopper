@@ -11,6 +11,7 @@
   "author": "Chris Dickinson <chris@neversaw.us> (http://neversaw.us/)",
   "license": "MIT",
   "dependencies": {
+    "are-we-dev": "^1.0.0",
     "colors-tmpl": "^1.0.0",
     "cpr": "^3.0.1",
     "culture-ships": "^1.0.1",
