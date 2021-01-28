@@ -32,9 +32,9 @@ with a schema and some populated records, and two handlers: `list` and
 
 Your goal is to:
 
-- Return an array of **3** books from the `list` endpoint.
-  - BONUS: Use `context.query.name` to filter books by name (using `"name:iContains"`) [2]
-- Lookup **1** book by `slug`. If there is no match, **return a 404**
+* Return an array of **3** books from the `list` endpoint.
+    * BONUS: Use `context.query.name` to filter books by name (using `"name:iContains"`) [2]
+* Lookup **1** book by `slug`. If there is no match, **return a 404**
 
 **Make sure you are running Docker!** Use `npm start` to run the server for
 local testing, and `npm run sql` to get a psql shell.
