@@ -2,6 +2,7 @@
 
 const orm = require('ormnomnom')
 const Author = require('./author.js')
+const fluent = require('fluent-json-schema')
 
 class Book {
     constructor({ id, title, author, author_id, genre, published, summary }) {

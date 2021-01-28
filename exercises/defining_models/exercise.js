@@ -12,7 +12,7 @@ const exercise = workshopper()
 
 // I just grabbed a UUID. Nothing special about it, aside from it
 // being JUST SO UNIQUE
-const DOCKER_IMAGE_NAME = 'pg-d0c2b4b5-1b05-4d50-9a28-660d5de88b36'
+const DOCKER_IMAGE_NAME = 'pg-abe02ac5-f9c2-4960-a5e6-ddfa46d63bcb'
 
 exercise.addPrepare(ready => {
   const dest = path.join(process.cwd(), 'defining-models')
@@ -215,7 +215,6 @@ exercise.addProcessor((mode, ready) => {
 
     if (response.statusCode !== 200) {
       exercise.emit('fail', `/books did not respond with 200; got ${response.statusCode}; ${response.payload}`)
-
       return cleanup(null, false)
     }
 

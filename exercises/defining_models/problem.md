@@ -29,7 +29,9 @@ module.exports = class Cat {
 ```
 
 By convention, `Cat.objects` is where the data access object is found, but this is only convention.
-The schema used in defining fields is the same used in Boltzmann: [ajv](https://ajv.js.org).
+The schema used to define fields is the same used in Boltzmann: [ajv](https://ajv.js.org).
+You can also use [fluent-json-schema](https://github.com/fastify/fluent-json-schema) in place of
+the syntax above, if you prefer.
 
 You can learn more about defining models in the ormnomnom docs chapter on
 [models](https://github.com/chrisdickinson/ormnomnom/blob/master/docs/building-models.md). You'll

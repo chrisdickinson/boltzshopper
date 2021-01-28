@@ -1,6 +1,7 @@
 'use strict'
 
 const orm = require('ormnomnom')
+const fluent = require('fluent-json-schema')
 
 class Author {
   constructor({ id, name }) {
@@ -12,4 +13,4 @@ class Author {
   static objects = null
 }
 
-module.exports = Book
+module.exports = Author
