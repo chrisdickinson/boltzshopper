@@ -31,6 +31,8 @@ const path = require('path')
 const os = require('os')
 // 
 // 
+const pg = require('pg')
+// 
 
 const THREW = Symbol.for('threw')
 const STATUS = Symbol.for('status')
@@ -141,8 +143,17 @@ let ajvStrict = null
 
     // 
     // 
+    this._postgresPool = null
+    this._postgresConnection = null
+    // 
   }
 
+  // 
+  /** @type {Promise<pg.Client>} */
+  get postgresClient () {
+    this._postgresConnection = this._postgresConnection || this._postgresPool.connect()
+    return this._postgresConnection
+  }
   // 
 
   get cookie () {
@@ -836,12 +847,57 @@ function session ({
 
 // 
 // 
+function attachPostgres ({
+  url = process.env.PGURL || `postgres://postgres@localhost:5432/${serviceName}`,
+  max = Number(process.env.PGPOOLSIZE) || 20
+} = {}) {
+  return async next => {
+    const pool = new pg.Pool({
+      connectionString: url,
+      max
+    })
 
+    // make sure we can connect.
+    const testConn = await pool.connect()
+    testConn.release()
+
+    return async function postgres (context) {
+      context._postgresPool = pool
+      const isTransaction = context.method !== 'GET' && context.method !== 'HEAD'
+      if (isTransaction) {
+        const client = await context.postgresClient
+        await client.query('BEGIN;')
+      }
+
+      const result = await next(context)
+      if (context._postgresConnection) {
+        const client = await context._postgresConnection
+        if (isTransaction) {
+          await client.query(result[THREW] ? 'ROLLBACK' : 'COMMIT')
+        }
+        await client.release()
+      }
+      return result
+    }
+  }
+}
 // 
 
 // 
 
 // 
+
+// 
+// - - - - - - - - - - - - - - - -
+// Reachability Checks
+// - - - - - - - - - - - - - - - -
+// 
+// 
+async function postgresReachability (context, meta) {
+  const client = await context.postgresClient
+  meta.status = 'got-client'
+  await client.query('select 1;')
+}
 // 
 
 // 
@@ -905,15 +961,53 @@ function test ({
 }) {
   const shot = require('@hapi/shot')
   // 
+  const database = process.env.TEST_DB_NAME || `${serviceName}_test`
+  const postgresClient = new pg.Client({
+    connectionString: process.env.PGURL || `postgres://localhost:5432/${database}`
+  })
+  postgresClient.connect()
+  // 
 
   // 
 
+  // 
+  after(() => {
+    // 
+    postgresClient.end()
+    // 
+    // 
+  })
   // 
 
   return inner => async assert => {
     [handlers, bodyParsers, middleware] = await Promise.all([handlers, bodyParsers, middleware])
     // 
 
+    // 
+    // if we're in postgres, run the test in a transaction, run
+    // routes in checkpoints.
+    await postgresClient.query(`begin`)
+
+    middleware.push(() => next => async context => {
+      context._postgresConnection = postgresClient
+      const savepointname = `test_${process.pid}_${Date.now()}_${savepointId++}`
+      const isTransactional = context.method !== 'GET' && context.method !== 'HEAD'
+      if (isTransactional) {
+        await postgresClient.query(`savepoint ${savepointname}`)
+      }
+
+      const result = await next(context)
+      if (isTransactional) {
+        if ((result || {})[THREW]) {
+          await postgresClient.query(`rollback to savepoint ${savepointname}`)
+        } else {
+          await postgresClient.query(`release savepoint  ${savepointname}`)
+        }
+      }
+
+      return result
+    })
+    assert.postgresClient = postgresClient
     // 
     // 
 
@@ -955,6 +1049,8 @@ function test ({
     try {
       await inner(assert, request)
     } finally {
+      // 
+      await postgresClient.query('rollback')
       // 
     }
   }
@@ -1130,6 +1226,8 @@ if (require.main === module) {
       log,
 
       // 
+      // 
+      attachPostgres,
       // 
       ...mw,
       // 

@@ -1,22 +1,42 @@
-# Writing a Boltzmann Handler
+# Selecting Data with ORMnomnom
 
-Boltzmann combines request routing and request handling: all handlers and
-routes attached to your app are found by loading `require("handlers")`. Any
-function with a `.route` property is attached to your application.
+ORMnomnom is an object-relational mapper, patterned after Django's, whose goal
+is to make the 80% of database interaction work easier, while getting out of
+your way for the remaining 20%.
 
-You respond to requests by returning (or throwing) values. Strings become plain
-text responses, while objects are automatically `JSON.stringify`'d.
+It uses a set [1] abstraction, called "QuerySets", to build SQL queries based
+on your models. You start from the set of "all records in this table", then
+winnow down the set using calls to `.filter()`. You can also optionally use
+`.slice()` to offset into (or limit!) the set of records returned. You can
+read more about ORMnomnom's API here [1].
 
-You can read more about these behaviors in the [Boltzmann Routing concept
-documentation](https://www.boltzmann.dev/en/docs/latest/concepts/handlers/).
+Querysets are lazily evaluated: they do not execute until you `await` them (or
+`.pipe()` them to an output.)
 
-Starting this lesson created a scaffold for you in `./writing-handlers/`. `cd` there
-now.
+```js
+const [books] =
+  Book.objects
+    .connection(await context.postgresClient) // use this postgres client
+    .filter({
+      'published:gt': '1985-11-04',           // "key:<filter type>": <filter value>
+      name: 'Design Patterns',                // "key": exact value
+    })
+    .slice(0, 10)
+```
 
-For this lesson, we want to add a handler that responds to `GET /hello/:foo`
-with whatever `foo` was, uppercased. You can add it to `handlers.js`. You can
-see all routes attached to your application using `npm run boltzmann:routes`,
-or start your application using `npm start`.
+This lesson created a `selecting-data` directory for you. `cd` there now.
 
-Once you've added the route, use `boltzshopper run .` to check your work! If it
-looks like it passed, run `boltzshopper verify .`.
+For this lesson, we've provided a `Book` model, a running postgres instance
+with a schema and some populated records, and two handlers: `list` and
+`detail`.
+
+Your goal is to:
+
+- Return **3** books from the `list` endpoint.
+  - BONUS: Use `context.query.name` to filter books by name (using `"name:icontains"`)
+- Lookup **1** book by `slug`. If there is no match, **return a 404**
+
+**Make sure you are running Docker!** Use `npm start` to run the server for
+local testing, and `npm run sql` to get a psql shell.
+
+[1]: https://github.com/chrisdickinson/ormnomnom/tree/master/docs

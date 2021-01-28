@@ -17,16 +17,16 @@
     returns a stream
   - make the error a 418, and make the stream return a 203 with a
     "x-clacks-overhead: gnu/terry pratchett" header.
-- [ ] accepting input
+- [x] writing a basic middleware
+- [x] attaching middleware
+- [x] accepting input
   - add an endpoint that accepts body input
   - check that valid json is available
-- [ ] writing a basic middleware
-  - attach a client to Context
 
 ## pt 2: ormnomnom
 
-- [ ] selecting objects
-- [ ] defining a model
+- [ ] selecting objects -- CD
+- [ ] defining a model -- CJ
 - [ ] selecting using joins
 - [ ] inserting rows
 - [ ] updating rows

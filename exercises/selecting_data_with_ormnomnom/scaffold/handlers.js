@@ -1,24 +1,21 @@
 'use strict'
 
-const { Context } = require('./boltzmann.js') // optionally pull in typescript definition
+const { Context } = require('./boltzmann.js')
+const Book = require('./models.js')
 
-index.route = 'GET /'
-async function index(/** @type {Context} */ context) {
-  const name = 'Friendly Boltzmann Author'
-  
-  return {
-    message: `welcome to boltzmann, ${name}!`,
-  }
+list.route = 'GET /'
+async function list(/** @type {Context} */ context) {
+  Book.objects.all()
+  return {}
 }
 
-greeting.route = 'GET /hello/:name'
-
-async function greeting(/** @type {Context} */ context) {
-  return `hello ${context.params.name}`
+detail.route = 'GET /:slug'
+async function detail(/** @type {Context} */ context) {
+  Book.objects.all()
+  return {}
 }
-
 
 module.exports = {
-  index,
-  greeting,
+  list,
+  detail,
 }

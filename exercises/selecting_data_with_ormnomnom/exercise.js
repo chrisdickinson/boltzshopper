@@ -11,11 +11,12 @@ const fs = require('fs')
 const exercise = workshopper()
 
 // I just grabbed a UUID. Nothing special about it, aside from it
-// being JUST SO UNIQUE
+// being JUST SO UNIQUE. Make sure this aligns with what's in
+// package.json's "sql" run script.
 const DOCKER_IMAGE_NAME = 'pg-1bb8346b-2312-4cd6-a1b3-0f2ebf6d2bba'
 
 exercise.addPrepare(ready => {
-  const dest = path.join(process.cwd(), 'persisting-data')
+  const dest = path.join(process.cwd(), 'selecting-data')
   if (!fs.existsSync(dest)) {
     cpr(path.join(__dirname, 'scaffold'), dest, install)
   } else {
@@ -151,13 +152,13 @@ exercise.addProcessor((mode, ready) => {
 
   async function migrate () {
     const fixture = fs.readFileSync(path.join(__dirname, 'fixture.sql'), 'utf8')
-
+    const connectionString = `postgres://postgres:postgres@127.0.0.1:${pgport}/postgres`
     let error = null
     for (const attempt of [0, 1, 2, 3]) {
       await new Promise(resolve => setTimeout(resolve, 500 * attempt))
 
       try {
-        client = new Client({ connectionString: `postgres://postgres:postgres@127.0.0.1:${pgport}/postgres` })
+        client = new Client({ connectionString })
         await client.connect()
       } catch (err) {
         error = err 
@@ -174,13 +175,53 @@ exercise.addProcessor((mode, ready) => {
       return ready(err)
     }
 
+    fs.writeFileSync(path.join(path.dirname(submission), '.env'), `PGURL="${connectionString}"`)
+    process.env.PGURL = connectionString
+
+    const oready = ready
+    ready = (...args) => {
+      client.end()
+      oready(...args)
+    }
     checkserver()
   }
 
-  function checkserver () {
-    client.end()
+  async function checkserver () {
+    if (exercise.args[0] === '__example') {
+      return ready(null, false)
+    }
 
-    return ready(null, true)
+    const boltzpath = path.join(path.dirname(submission), 'boltzmann.js')
+    var boltzmann = null
+    try {
+      boltzmann = require(boltzpath)
+    } catch (err) {
+      exercise.emit('fail', `Could not load ${boltzpath.replace(process.cwd(), '.')} – caught ${err.stack}`)
+      return ready(null, false)
+    }
+
+    var response = null
+    var postgresClient = null
+    const wrapped = boltzmann.middleware.test({
+      after: () => {}
+    })(async assert => {
+      postgresClient = assert.postgresClient
+      response = await assert.request({ url: `/` })
+    })
+
+    if (postgresClient) {
+      postgresClient.end()
+    }
+
+    try {
+      await wrapped({})
+    } catch (err) {
+      exercise.emit('fail', `Could not request GET / – caught ${err.stack}`)
+      return ready(null, false)
+    }
+    console.log(response)
+
+    return ready(null, false)
   }
 })
 
