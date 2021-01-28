@@ -14,6 +14,7 @@
     "colors-tmpl": "^1.0.0",
     "cpr": "^3.0.1",
     "is-docker-running": "^1.0.5",
+    "ormnomnom": "^7.1.0",
     "pg": "^8.5.1",
     "workshopper": "^2.7.0",
     "workshopper-boilerplate": "^1.1.2",
