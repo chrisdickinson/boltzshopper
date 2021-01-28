@@ -189,6 +189,7 @@ exercise.addProcessor((mode, ready) => {
     } else {
       exercise.emit('pass', 'LGTM! Run "boltzshopper verify ." to continue!')
     }
+    return ready(null, true)
   }
 })
 
