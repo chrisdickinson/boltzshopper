@@ -13,6 +13,7 @@
   "dependencies": {
     "colors-tmpl": "^1.0.0",
     "cpr": "^3.0.1",
+    "culture-ships": "^1.0.1",
     "is-docker-running": "^1.0.5",
     "ormnomnom": "^7.1.0",
     "pg": "^8.5.1",
