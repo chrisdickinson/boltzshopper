@@ -8,59 +8,50 @@ Boltzmann middleware can be attached at the **application** level or at the
 **handler** level. **Application**-attached middleware runs whenever your
 application receives a request. 
 
----- tktktk
-
-
-Middleware, so named because it sits in the "middle" of two other wares, is
-a common concept in HTTP frameworks with a lot of different interpretations.
-
-Boltzmann treats middleware as an onion. Boltzmann middleware is responsible for
-producing an adaptor, which accepts a `next` function and returns a handler. The
-handler receives `Context` objects whenever a request passes through it, and may
-(or may not) call the `next` function zero to many times. The most basic pass-through
-middleware is as follows:
+You can attach middleware to your application using the `APP_MIDDLEWARE` export
+in `middleware.js`, while handlers support middleware attachment via the
+`.middleware` property:
 
 ```js
-const myMiddleware = () => next => async context => next(context)
-#     middleware:    ^------------------------------------------^
-#     the adaptor part:    ^------------------------------------^
-#     the handler part:            ^----------------------------^
+// middleware.js                  // handlers.js
+module.exports = {                index.route = 'GET /'
+  APP_MIDDLEWARE: [               index.middleware = [
+    myMiddleware                    myMiddleware
+  ]                               ]
+}                                 async function index (context) {
+                                  }
 ```
 
-It's not very useful, yet! Usually you'll do configuration validation in the
-**middleware part**, any setup that needs to be done for the lifetime of the app
-in the **adaptor part**, and any logic that needs to run on every request in the
-**handler part**. (Notably, the **adaptor part** can be async, too!)
+You can read more about attaching middleware in the boltzmann docs [1].
 
-One common pattern is to create an instance of a client for an external service
-in the **adaptor** part using config from the **middleware part**, then attach
-it to every context passed to the **handler part**. This is handy because,
-under test, boltzmann allows you to inject different middleware than your
-production app; this allows for zero-dependency mocking of external
-dependencies. An example middleware might look like:
+Boltzmann separates middleware **configuration** from middleware
+**instantiation**. In other words, you give Boltzmann your middleware and
+configuration, and Boltzmann will take care of calling it for you at the
+appropriate time. Configuration uses **Babel** style arrays: if you pass the
+function directly, Boltzmann will call the middleware with no arguments. If the
+line is an array with the middleware function as the first element, all
+subsequent elements are treated as arguments:
 
 ```js
-const myRedisMiddleware = ({connectionString = process.env.REDIS_URL} = {}) => {
-  assert(connectionString, 'parameter "connectionString" is required!') // config validation
-
-  return async next => {
-    const client = redis.createClient() // make a client and make sure it works
-    await client.pingAsync()
-
-    return context => {
-      context.redisClient = client // now attach it in the handler
-      return next(context)
-    }
-  }
+index.route = 'GET /'
+index.middleware = [
+  myMiddleware,                                   // myMiddleware()
+  [complexMiddleware, {something: 'foo'}, 'bar']  // complexMiddleware({something: 'foo'}, 'bar')
+]
+async function index (context) {
 }
 ```
 
-This lesson created a `writing-middleware` directory for you. `cd` into it now.
-In this lesson, we've provided a client class for your in `middleware.js`; your
-goal is to write middleware that validates config, instantiates a client in the
-**adaptor** part, then attaches it as `context.myClient` in the **handler
-part**. Make sure to export your middleware from `middleware.js` as
-`attachClient`!
+This lesson created a `attaching-middleware` directory for you. `cd` there now.
+This lesson provides 1 handler and middleware, `indexHandler` and `myMiddleware`.
+
+- To the `indexHandler` middleware, attach the `myMiddleware` middleware with
+  no arguments.
+- To the application, attach `myMiddleware` with one arg, `"hello world"`.
+- Write your own pass-through middleware and attach it to the application after
+  `myMiddleware`.
 
 Once you've written your middleware, use `boltzshopper run .` to check your
 work! If it looks like it passed, run `boltzshopper verify .`.
+
+[1]: https://www.boltzmann.dev/en/docs/latest/concepts/middleware/#attaching-configuring-middleware
