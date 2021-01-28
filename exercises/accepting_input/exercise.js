@@ -5,7 +5,6 @@ const child_process = require('child_process')
 const path = require('path')
 const cpr = require('cpr')
 const fs = require('fs')
-const { headers } = require('./scaffold/handlers')
 
 const exercise = workshopper()
 
