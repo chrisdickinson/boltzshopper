@@ -386,7 +386,7 @@ exercise.addProcessor((mode, ready) => {
     }
 
     exercise.emit('pass', message)
-    return ready(null, false)
+    return ready(null, true)
   }
 })
 
