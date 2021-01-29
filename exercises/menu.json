@@ -7,5 +7,6 @@
   "attaching middleware",
   "accepting input",
   "selecting data with ORMnomnom",
+  "mutating data with ORMnomnom",
   "defining models"
 ]
