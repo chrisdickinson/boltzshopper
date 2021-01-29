@@ -6,7 +6,7 @@ noticed that it isn't actually doing anything yet! That's because we haven't
 
 Boltzmann middleware can be attached at the **application** level or at the
 **handler** level. **Application**-attached middleware runs whenever your
-application receives a request. 
+application receives a request.
 
 You can attach middleware to your application using the `APP_MIDDLEWARE` export
 in `middleware.js`, while handlers support middleware attachment via the
@@ -45,11 +45,9 @@ async function index (context) {
 This lesson created a `attaching-middleware` directory for you. `cd` there now.
 This lesson provides 1 handler and middleware, `indexHandler` and `myMiddleware`.
 
-- To the `indexHandler` middleware, attach the `myMiddleware` middleware with
-  no arguments.
+- To the `indexHandler` middleware, attach the `myMiddleware` middleware with no arguments.
 - To the application, attach `myMiddleware` with one arg, `"hello world"`.
-- Write your own pass-through middleware and attach it to the application after
-  `myMiddleware`.
+- Write your own pass-through middleware and attach it to the application after `myMiddleware`.
 
 Once you've written your middleware, use `boltzshopper run .` to check your
 work! If it looks like it passed, run `boltzshopper verify .`.
