@@ -45,9 +45,13 @@ async function index (context) {
 This lesson created a `attaching-middleware` directory for you. `cd` there now.
 This lesson provides 1 handler and middleware, `indexHandler` and `myMiddleware`.
 
-- To the `indexHandler` middleware, attach the `myMiddleware` middleware with no arguments.
-- To the application, attach `myMiddleware` with one arg, `"hello world"`.
-- Write your own pass-through middleware and attach it to the application after `myMiddleware`.
+(1) To the `indexHandler` middleware, attach the `myMiddleware` middleware with
+no arguments.
+
+(2) To the application, attach `myMiddleware` with one arg, `"hello world"`.
+
+(3) Write your own pass-through middleware and attach it to the application
+after `myMiddleware`.
 
 Once you've written your middleware, use `boltzshopper run .` to check your
 work! If it looks like it passed, run `boltzshopper verify .`.

@@ -46,10 +46,18 @@ const myRedisMiddleware = ({connectionString = process.env.REDIS_URL} = {}) => {
 
 This lesson created a `writing-middleware` directory for you. `cd` into it now.
 In this lesson, we've provided a client class for your in `middleware.js`; your
-goal is to write middleware that validates config, instantiates a client in the
-**adaptor** part, then attaches it as `context.myClient` in the **handler
-part**. Make sure to export your middleware from `middleware.js` as
-`attachClient`!
+goals are:
+
+(1) to write a middleware that validates its config: it should take one
+argument and assert that it is a string;
+
+(2) to instantiates a client in the **adaptor** part of your middleware
+**once**;
+
+(3) to attach that client to `context` as `context.myClient` in the **handler
+part** of your middleware.
+
+_(Make sure to export your middleware from `middleware.js` as `attachClient`!)_
 
 Once you've written your middleware, use `boltzshopper run .` to check your
 work! If it looks like it passed, run `boltzshopper verify .`.

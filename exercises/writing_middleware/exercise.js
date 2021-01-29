@@ -2,6 +2,7 @@
 
 const workshopper = require('workshopper-exercise')
 const child_process = require('child_process')
+const assert = require('assert')
 const path = require('path')
 const util = require('util')
 const cpr = require('cpr')
@@ -108,10 +109,21 @@ exercise.addProcessor((mode, ready) => {
       return ready(null, false)
     }
 
+    try {
+      middleware.attachClient(133131)
+      exercise.emit('fail', `the middleware should assert that the "url" argument is a string; try the "assert" module!`)
+      return ready(null, false)
+    } catch (err) {
+      if (!(err instanceof assert.AssertionError)) {
+        exercise.emit('fail', `caught an error trying to execute attachClient: ${err.stack}`)
+        return ready(null, false)
+      }
+    }
+
     // 3rd, test that calling the middleware returns a function, AND that we haven't instantiated a client yet
     var adaptor
     try {
-      adaptor = middleware.attachClient()
+      adaptor = middleware.attachClient("just a test")
     } catch (err) {
       exercise.emit('fail', `caught an error trying to execute attachClient: ${err.stack}`)
       return ready(null, false)
