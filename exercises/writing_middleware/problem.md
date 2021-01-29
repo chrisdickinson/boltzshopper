@@ -60,4 +60,4 @@ part** of your middleware.
 _(Make sure to export your middleware from `middleware.js` as `attachClient`!)_
 
 Once you've written your middleware, use `boltzshopper run .` to check your
-work! If it looks like it passed, run `boltzshopper verify .`.
+work! If it looks like it passed, run `boltzshopper verify .`

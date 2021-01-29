@@ -14,5 +14,10 @@ $ npm run boltzmann:upgrade -- . --jwt --status=off
 $ npx boltzmann-cli . --jwt --status=off
 ```
 
+(We're using `--jwt` and `--status` as examples here. You can see a full
+list of features in the CLI reference doc [1].)
+
 Once you've run the command, use `boltzshopper run .` to check your work!
-If it looks like it passed, run `boltzshopper verify .`.
+If it looks like it passed, run `boltzshopper verify .`
+
+[1]: https://www.boltzmann.dev/en/docs/latest/reference/cli/#feature-flipping

@@ -40,4 +40,4 @@ As a next step, implement _input validation_ for all the handlers that accept in
 add the requirement that books must have titles and authors to be added to the database.
 
 Once you've implemented the handlers, use `boltzshopper run .` to check your work! If it looks like
-it passed, run `boltzshopper verify .`.
+it passed, run `boltzshopper verify .`

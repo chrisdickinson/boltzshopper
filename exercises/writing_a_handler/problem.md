@@ -19,4 +19,4 @@ see all routes attached to your application using `npm run boltzmann:routes`,
 or start your application using `npm start`.
 
 Once you've added the route, use `boltzshopper run .` to check your work! If it
-looks like it passed, run `boltzshopper verify .`.
+looks like it passed, run `boltzshopper verify .`

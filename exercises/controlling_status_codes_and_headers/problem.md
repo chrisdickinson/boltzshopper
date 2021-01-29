@@ -31,4 +31,4 @@ to give the thrown error a `418` status code, while giving the plain response a 
 and a `wow-great-header: a great value` response header.
 
 Once you've added the headers, use `boltzshopper run .` to check your work! If it looks like it
-passed, run `boltzshopper verify .`.
+passed, run `boltzshopper verify .`

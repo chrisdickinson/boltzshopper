@@ -54,6 +54,6 @@ no arguments.
 after `myMiddleware`.
 
 Once you've written your middleware, use `boltzshopper run .` to check your
-work! If it looks like it passed, run `boltzshopper verify .`.
+work! If it looks like it passed, run `boltzshopper verify .`
 
 [1]: https://www.boltzmann.dev/en/docs/latest/concepts/middleware/#attaching-configuring-middleware
