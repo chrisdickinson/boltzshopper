@@ -11,7 +11,7 @@ const exercise = workshopper()
 
 exercise.addPrepare(ready => {
   const dest = path.join(process.cwd(), 'writing-middleware')
-  if (!fs.existsSync(dest)) {
+  if (!fs.existsSync(dest) && !process.cwd().includes('writing-middleware')) {
     cpr(path.join(__dirname, 'scaffold'), dest, install)
   } else {
     return ready()

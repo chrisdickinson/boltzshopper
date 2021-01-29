@@ -42,7 +42,9 @@
     "boltzmann:upgrade": "npx boltzmann-cli",
     "lint": "eslint .",
     "posttest": "npm run lint",
-    "sql": "boltzshopper run __example 2>&1; docker exec -it pg-abe02ac5-f9c2-4960-a5e6-ddfa46d63bcb psql postgres://postgres:postgres@localhost/postgres",
+    "presql": "boltzshopper run ._boltzshopper 2>&1 >/dev/null || true",
+    "sql": "docker exec -it pg-abe02ac5-f9c2-4960-a5e6-ddfa46d63bcb psql postgres://postgres:postgres@localhost/postgres",
+    "prestart": "boltzshopper run ._boltzshopper 2>&1 >/dev/null || true",
     "start": "nodemon ./boltzmann.js",
     "test": "boltzshopper run ."
   },

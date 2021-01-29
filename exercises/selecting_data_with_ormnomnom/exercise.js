@@ -18,7 +18,8 @@ const DOCKER_IMAGE_NAME = 'pg-1bb8346b-2312-4cd6-a1b3-0f2ebf6d2bba'
 
 exercise.addPrepare(ready => {
   const dest = path.join(process.cwd(), 'selecting-data')
-  if (!fs.existsSync(dest)) {
+  
+  if (!fs.existsSync(dest) && !process.cwd().includes('selecting-data')) {
     cpr(path.join(__dirname, 'scaffold'), dest, install)
   } else {
     ready()
@@ -29,6 +30,7 @@ exercise.addPrepare(ready => {
       return ready(err)
     }
 
+    fs.writeFileSync(path.join(dest, '._boltzshopper'), '', 'utf8')
     const proc = child_process.spawn('npm', ['ci'], {
       cwd: dest
     })
@@ -188,7 +190,7 @@ exercise.addProcessor((mode, ready) => {
   }
 
   async function checkserver () {
-    if (exercise.args[0] === '__example') {
+    if (exercise.args[0] === '._boltzshopper') {
       return ready(null, false)
     }
 

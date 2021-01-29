@@ -16,7 +16,7 @@ const DOCKER_IMAGE_NAME = 'pg-abe02ac5-f9c2-4960-a5e6-ddfa46d63bcb'
 
 exercise.addPrepare(ready => {
   const dest = path.join(process.cwd(), 'defining-models')
-  if (!fs.existsSync(dest)) {
+  if (!fs.existsSync(dest) && !process.cwd().includes('defining-models')) {
     cpr(path.join(__dirname, 'scaffold'), dest, install)
   } else {
     ready()
@@ -27,6 +27,7 @@ exercise.addPrepare(ready => {
       return ready(err)
     }
 
+    fs.writeFileSync(path.join(dest, '._boltzshopper'), '', 'utf8')
     const proc = child_process.spawn('npm', ['ci'], {
       cwd: dest
     })
@@ -152,13 +153,13 @@ exercise.addProcessor((mode, ready) => {
   async function migrate () {
     const fixture = fs.readFileSync(path.join(__dirname, 'fixture.sql'), 'utf8')
 
-    process.env.PGURL = `postgres://postgres:postgres@127.0.0.1:${pgport}/postgres`
+    const connectionString = `postgres://postgres:postgres@127.0.0.1:${pgport}/postgres`
     let error = null
     for (const attempt of [0, 1, 2, 3]) {
       await new Promise(resolve => setTimeout(resolve, 500 * attempt))
 
       try {
-        client = new Client({ connectionString: `postgres://postgres:postgres@127.0.0.1:${pgport}/postgres` })
+        client = new Client({ connectionString })
         await client.connect()
       } catch (err) {
         error = err
@@ -175,11 +176,17 @@ exercise.addProcessor((mode, ready) => {
       return ready(err)
     }
 
+    fs.writeFileSync(path.join(path.dirname(submission), '.env'), `PGURL="${connectionString}"`)
+    process.env.PGURL = connectionString
+
     client.end()
     checkserver()
   }
 
   async function checkserver () {
+    if (exercise.args[0] === '._boltzshopper') {
+      return ready(null, false)
+    }
 
     function cleanup(err, okay) {
       if (pgClient) {

@@ -12,7 +12,11 @@ exercise.longCompareOutput = true
 
 // checks that the submission file actually exists
 exercise.addPrepare(ready => {
-  cpr(path.join(__dirname, 'scaffold'), path.join(process.cwd(), 'upgrading'), ready)
+  if (!fs.existsSync('upgrading' && !process.cwd().includes('upgrading')) {
+    cpr(path.join(__dirname, 'scaffold'), path.join(process.cwd(), 'upgrading'), ready)
+  } else {
+    return ready()
+  }
 })
 
 exercise.addProcessor((mode, ready) => {

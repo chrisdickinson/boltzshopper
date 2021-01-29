@@ -12,7 +12,7 @@ const exercise = workshopper()
 
 exercise.addPrepare(ready => {
   const dest = path.join(process.cwd(), 'http-metadata')
-  if (!fs.existsSync(dest)) {
+  if (!fs.existsSync(dest) && !process.cwd().includes('http-metadata')) {
     cpr(path.join(__dirname, 'scaffold'), dest, install)
   } else {
     ready()
