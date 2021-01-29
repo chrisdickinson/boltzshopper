@@ -1,14 +1,14 @@
 {
   "name": "boltzshopper",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "a workshopper for boltzmann",
   "main": "boltzshopper.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/chrisdickinson/boltzshopper.git"
+    "type": "git",
+    "url": "https://github.com/chrisdickinson/boltzshopper.git"
   },
   "keywords": [],
   "bin": "./boltzshopper.js",
